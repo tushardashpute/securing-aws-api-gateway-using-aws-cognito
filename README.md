@@ -57,12 +57,83 @@ curl -X POST --user <app client id>:<app client secret> 'https://testlambdaapi.a
  Cognito follows the OAuth2 specification. You can try passing a specific scope in the CURL command and check the token.
  
 //access_token returned with below CURL command should return only lambdaApi/create_lambda scope
-curl -X POST --user <app client id>:<app client secret> 'https://testlambdaapi.auth.us-east-1.amazoncognito.com/oauth2/token?grant_type=client_credentials&scope=product-api/delete_product' -H 'Content-Type: application/x-www-form-urlencoded'
+
+ curl -X POST --user <app client id>:<app client secret> 'https://testlambdaapi.auth.us-east-1.amazoncognito.com/oauth2/token?grant_type=client_credentials&scope=product-api/delete_product' -H 'Content-Type: application/x-www-form-urlencoded'
  
  
  **2.Create Lambda Functions (getLambda/PutLambda/DeleteLambda)**
 
- 3. Create API gateway, Create methods(GET/POST/DELETE) and integrate it with Lambda Funtion which we created
- 4. Test the Gateway endpoint 
+- Login to AWS Management console and navigate to AWS Lambda service.
+- Create a new function. In this screen, select author from scratch .Give name as getLambda, Select runtime as python 3.9.
+ 
+ <img width="1440" alt="image" src="https://user-images.githubusercontent.com/74225291/166412778-4be48a7a-41eb-46b1-9a11-36d33b6b3c67.png">
+
+ Now goto code and write below code.
+ 
+   import json
+
+  def lambda_handler(event, context):
+      # TODO implement
+      return {
+          'statusCode': 200,
+          'body': json.dumps('Hello from Get Lambda!')
+      }
+
+ Deploy it and test it.
+ 
+ <img width="1402" alt="image" src="https://user-images.githubusercontent.com/74225291/166413018-971a939b-78b3-4ed1-8478-212a1ddb1dfb.png">
+
+ <img width="1444" alt="image" src="https://user-images.githubusercontent.com/74225291/166413044-e6aee083-36d6-4f25-b90c-2a8ab72f4869.png">
+
+ 
+Similarly create 2 more lambdaFuntions, putLambda and DeleteLambda.
+ 
+ <img width="1444" alt="image" src="https://user-images.githubusercontent.com/74225291/166413115-a3de2a11-f72a-4387-858d-dc3e55033a6e.png">
+
+**3. Create API gateway, Create methods(GET/POST/DELETE) and integrate it with Lambda Funtion which we created**
+ 
+- Login to AWS Management console and navigate to API Gateway service.
+- Create API. In this screen, select REST API --> Build Give name as LAmbDA-API.
+
+ <img width="1311" alt="image" src="https://user-images.githubusercontent.com/74225291/166413290-7efba689-2e77-4ac3-95a6-1dc35943df9d.png">
+
+ <img width="1523" alt="image" src="https://user-images.githubusercontent.com/74225291/166413715-cfb7824a-8cbd-4e8d-affc-e4c8105dcbef.png">
+ 
+ Goto Resources --> Action -->  add resource
+ 
+ <img width="1525" alt="image" src="https://user-images.githubusercontent.com/74225291/166413849-99c3e667-8a72-4be5-ae64-4d985c7fcce3.png">
+ 
+ Goto resource --> Action --> Add method (GET/POST/DELETE)
+ 
+ <img width="1507" alt="image" src="https://user-images.githubusercontent.com/74225291/166414428-fd096a71-ba1d-4a65-8151-db41def0fb3e.png">
+ 
+ Now integrate the Lambda with it.
+ 
+ <img width="1520" alt="image" src="https://user-images.githubusercontent.com/74225291/166414565-a7c30c1c-56d6-413d-aa62-f75daf3882e2.png">
+
+ Do same for remaining two methods as well.
+ 
+ Now deploy the API.
+ 
+ <img width="1472" alt="image" src="https://user-images.githubusercontent.com/74225291/166414690-b54353a6-2e86-44e9-ae77-6904de9c98c2.png">
+
+ 
+ <img width="723" alt="image" src="https://user-images.githubusercontent.com/74225291/166414723-a7667b18-a987-48fe-80b4-6ea54cd56ca1.png">
+
+
+ 
+**4. Test the Gateway endpoint** 
+
+ Now access the API using the API URL which we get after deployment.
+ 
+ Gateway_api_url/resource_name
+ 
+ <img width="931" alt="image" src="https://user-images.githubusercontent.com/74225291/166415133-009b1764-e100-4a4b-89a8-c74b6c46ca3a.png">
+
+ <img width="910" alt="image" src="https://user-images.githubusercontent.com/74225291/166415306-c9967f8e-a960-4d6c-9b6a-244642f6273c.png">
+
+
  5. Create authorization as a cognito in API Gateway
+ 
+ 
  6. Add authorization to each method which we created  
