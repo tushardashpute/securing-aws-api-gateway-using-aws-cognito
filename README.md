@@ -8,7 +8,7 @@ Steps:
  4. Test the Gateway endpoint 
  5. Create authorization as a cognito in API Gateway
  6. Add authorization to each method which we created 
-
+ 7. Testing
 
 **1.Create a AWS Cognito user pool and configure OAuth agents**
 
@@ -128,12 +128,50 @@ Similarly create 2 more lambdaFuntions, putLambda and DeleteLambda.
  
  Gateway_api_url/resource_name
  
- <img width="931" alt="image" src="https://user-images.githubusercontent.com/74225291/166415133-009b1764-e100-4a4b-89a8-c74b6c46ca3a.png">
+ <img width="910" alt="image" src="https://user-images.githubusercontent.com/74225291/166418763-2ff2e186-568d-41f4-bc41-1477e4992287.png">
 
  <img width="910" alt="image" src="https://user-images.githubusercontent.com/74225291/166415306-c9967f8e-a960-4d6c-9b6a-244642f6273c.png">
 
+<img width="910" alt="image" src="https://user-images.githubusercontent.com/74225291/166418836-e1844b1a-4532-4957-8088-7748bc8e27fd.png">
 
- 5. Create authorization as a cognito in API Gateway
+ 
+**5. Create authorization as a cognito in API Gateway**
+ 
+ Goto API gateway --> Authorizores and create new cognito authorizer
+ 
+ <img width="910" alt="image" src="https://user-images.githubusercontent.com/74225291/166418947-4d529a08-aaa3-4eec-bb9c-b18b5af2abb4.png">
+
+**6. Add cognito authorization to each method which we created**  
+
+ - Go to “Resources” and select “GET” method. Select “Method Request” configuration on right pane.
+ - Select “Cognito_Authorizer” in “Authorization” drop-down. That should automatically add a new field “OAuth Scopes”. Enter “lambdaApi/create_lambda” scope and save using the tick mark.
+ 
+ <img width="1531" alt="image" src="https://user-images.githubusercontent.com/74225291/166421620-5e831c98-bb60-4cd2-a44a-239c0f66ecd4.png">
+ 
+ - Similarly, map DELETE method to “lambdaApi/delete_lambda” and POST method to “lambdaApi/create_lambda”
+ 
+ <img width="1036" alt="image" src="https://user-images.githubusercontent.com/74225291/166421852-f62711b7-e039-4468-9c1e-5a26dadd3e34.png">
+
+ <img width="1067" alt="image" src="https://user-images.githubusercontent.com/74225291/166421938-eb0f9971-4df6-428d-afab-7b7b5963c1b4.png">
+ 
+-  Select “Actions > Deploy API” and select “Deployment stage” as “dev”. This should deploy the latest changes in these APIs.
+
+**7. Testing**
+ 
+ Now, let us test this API using the access_token obtained from Cognito
+ 
+   % curl -X GET 'https://h7l9qseapd.execute-api.us-east-1.amazonaws.com/Dev/lambdaapi' -H 'Content-Type: application/json'
+  {"message":"Unauthorized"}%      
+ 
+ Now we will use the access token, to access the API endpoint.
+ 
+   % curl -X POST --user 4jh9topp45s1fc8n4g64shtls2:1jq0ms2h578rrc5v01r41362dec503cpvro886oi1ohgopq7f9iu 'https://testlambdaapi.auth.us-east-1.amazoncognito.com/oauth2/token?grant_type=client_credentials' -H 'Content-Type: application/x-www-form-urlencoded'
+
+  {"access_token":"eyJraWQiOiI3ak5xZ0hoZ3JCK0F3RGZcLzZ0bEdhZEJUTUhvbEJHdktNdXBqaTBBY2dRZz0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0amg5dG9wcDQ1czFmYzhuNGc2NHNodGxzMiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoibGFtYmRhQXBpXC9jcmVhdGVfbGFtYmRhIGxhbWJkYUFwaVwvcmVhZF9sYW1iZGEgbGFtYmRhQXBpXC9kZWxldGVfbGFtYmRhIiwiYXV0aF90aW1lIjoxNjUxNTY1NDk3LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV9CUmFoeFBmSE0iLCJleHAiOjE2NTE1NjkwOTcsImlhdCI6MTY1MTU2NTQ5NywidmVyc2lvbiI6MiwianRpIjoiNTNhMGRhNjgtZWRkZC00MzBiLWFkNWItNTBkYmU5ZjAyM2QyIiwiY2xpZW50X2lkIjoiNGpoOXRvcHA0NXMxZmM4bjRnNjRzaHRsczIifQ.AtLo5xlxNx8C0vquzUMDPfGvivXIhfKOM3QFEf8PWb-phX2q86mxQMMHyYQ95gtEdb0Qdx7FrEc5zRdg94urvLyDprvlJospEa8x7UvGWO_9iJ-hp54QQFW4ySLjX3DMUQPUD7HXKeR9ycQmOyrBAA_EGHs1hEq2Vwc51X3FNTPbacMjyWMq7pMxtzwCKkt2Q9i6oOx85d7qxxJsJ_cAoYm1U_bGXO1jCYXUCBQsK7DcnDAKp4PSYMvvh2D4Q4vXx1WGOpLeb-RQyqeQNqMXUotbkxJV_TwMsnkCucHMukEaLBXKKaLiOdMawXd0WxbTV9P-dJOVUhZxzBvAnMWhGw","expires_in":3600,"token_type":"Bearer"}
  
  
- 6. Add authorization to each method which we created  
+**curl -X GET 'https://<Invoke URL>/lambdaapi' -H 'Content-Type: application/json' -H 'Authorization:<access_token>'**
+ 
+   % curl -X GET 'https://h7l9qseapd.execute-api.us-east-1.amazonaws.com/Dev/lambdaapi' -H 'Content-Type: application/json' -H 'Authorization:eyJraWQiOiI3ak5xZ0hoZ3JCK0F3RGZcLzZ0bEdhZEJUTUhvbEJHdktNdXBqaTBBY2dRZz0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0amg5dG9wcDQ1czFmYzhuNGc2NHNodGxzMiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoibGFtYmRhQXBpXC9jcmVhdGVfbGFtYmRhIGxhbWJkYUFwaVwvcmVhZF9sYW1iZGEgbGFtYmRhQXBpXC9kZWxldGVfbGFtYmRhIiwiYXV0aF90aW1lIjoxNjUxNTY1NDk3LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV9CUmFoeFBmSE0iLCJleHAiOjE2NTE1NjkwOTcsImlhdCI6MTY1MTU2NTQ5NywidmVyc2lvbiI6MiwianRpIjoiNTNhMGRhNjgtZWRkZC00MzBiLWFkNWItNTBkYmU5ZjAyM2QyIiwiY2xpZW50X2lkIjoiNGpoOXRvcHA0NXMxZmM4bjRnNjRzaHRsczIifQ.AtLo5xlxNx8C0vquzUMDPfGvivXIhfKOM3QFEf8PWb-phX2q86mxQMMHyYQ95gtEdb0Qdx7FrEc5zRdg94urvLyDprvlJospEa8x7UvGWO_9iJ-hp54QQFW4ySLjX3DMUQPUD7HXKeR9ycQmOyrBAA_EGHs1hEq2Vwc51X3FNTPbacMjyWMq7pMxtzwCKkt2Q9i6oOx85d7qxxJsJ_cAoYm1U_bGXO1jCYXUCBQsK7DcnDAKp4PSYMvvh2D4Q4vXx1WGOpLeb-RQyqeQNqMXUotbkxJV_TwMsnkCucHMukEaLBXKKaLiOdMawXd0WxbTV9P-dJOVUhZxzBvAnMWhGw'                             
+
+   {"statusCode": 200, "body": "\"Hello from Get Lambda!\""}%                                                      
